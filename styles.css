@@ -1,0 +1,267 @@
+body {
+    margin: 0;
+    font-family: 'Orbitron', sans-serif;
+    background: linear-gradient(180deg, #0a0a23, #1b1b4f);
+    color: #fff;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Fond de particules */
+#particles-js {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* Modal d'introduction */
+.intro-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.modal-content {
+    background: #1b1b4f;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    border: 2px solid #00b7eb;
+    box-shadow: 0 0 20px #00b7eb;
+    animation: glow 1.5s ease-in-out infinite alternate;
+}
+.modal-content h1 {
+    font-size: 2em;
+    color: #00b7eb;
+    text-shadow: 0 0 10px #00b7eb;
+}
+.modal-content p {
+    font-size: 1.2em;
+    margin: 20px 0;
+}
+#start-game {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    background: #00b7eb;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+#start-game:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px #00b7eb;
+}
+
+/* Conteneur principal */
+.game-container {
+    text-align: center;
+    padding: 20px;
+    position: relative;
+    z-index: 2;
+    display: none;
+}
+h1.glitch {
+    font-size: 2.5em;
+    color: #00b7eb;
+    text-shadow: 0 0 10px #00b7eb;
+    position: relative;
+    animation: glitch 1s linear infinite;
+}
+h1.glitch::before, h1.glitch::after {
+    content: 'LayerEdge Blockchain Builder';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    color: #ff073a;
+    opacity: 0.5;
+}
+h1.glitch::before {
+    animation: glitch-top 1s linear infinite;
+    clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+}
+h1.glitch::after {
+    animation: glitch-bottom 1.5s linear infinite;
+    clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
+}
+
+/* Animations glitch */
+@keyframes glitch {
+    2%, 64% { transform: translate(2px, 0) skew(0deg); }
+    4%, 60% { transform: translate(-2px, 0) skew(0deg); }
+    62% { transform: translate(0, 0) skew(5deg); }
+}
+@keyframes glitch-top {
+    2%, 64% { transform: translate(2px, -2px); }
+    4%, 60% { transform: translate(-2px, 2px); }
+    62% { transform: translate(0, 0) skew(5deg); }
+}
+@keyframes glitch-bottom {
+    2%, 64% { transform: translate(-2px, 2px); }
+    4%, 60% { transform: translate(2px, -2px); }
+    62% { transform: translate(0, 0) skew(-5deg); }
+}
+
+/* Score et timer */
+.score {
+    font-size: 1.5em;
+    margin: 20px 0;
+    color: #39ff14;
+    text-shadow: 0 0 5px #39ff14;
+}
+#timer { color: #ff073a; animation: pulse 1s infinite; }
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Leaderboard */
+.leaderboard {
+    margin: 20px 0;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #39ff14;
+}
+.leaderboard h2 {
+    font-size: 1.5em;
+    color: #00b7eb;
+}
+#leaderboard-list {
+    list-style: none;
+    padding: 0;
+    color: #fff;
+}
+
+/* Chaîne de blocs */
+.chain {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    padding: 20px;
+    max-width: 100%;
+    overflow-x: auto;
+}
+.block {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(45deg, #00b7eb, #39ff14);
+    border: 2px solid #39ff14;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: bold;
+    text-shadow: 0 0 5px #000;
+    animation: materialize 0.5s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+.block::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: scan 2s infinite;
+}
+
+/* NFT Teaser */
+.nft-teaser {
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    border: 1px solid #00b7eb;
+}
+.nft-preview {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(45deg, #ff073a, #00b7eb);
+    margin: 10px auto;
+    border-radius: 8px;
+    animation: pulse 1s infinite;
+}
+.hidden { display: none; }
+
+/* Animations */
+@keyframes materialize {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+}
+@keyframes scan {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
+}
+@keyframes glow {
+    0% { text-shadow: 0 0 10px #00b7eb, 0 0 20px #00b7eb; }
+    100% { text-shadow: 0 0 20px #00b7eb, 0 0 30px #39ff14; }
+}
+
+/* Message */
+.message {
+    font-size: 1.2em;
+    margin: 20px 0;
+    color: #39ff14;
+    text-shadow: 0 0 5px #39ff14;
+    opacity: 0;
+    animation: fadeIn 1s forwards;
+}
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+/* Boutons */
+button {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    background: #00b7eb;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    margin: 10px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px #00b7eb;
+}
+
+/* Footer */
+footer {
+    margin-top: 20px;
+    font-size: 1em;
+    color: #fff;
+}
+footer a {
+    color: #39ff14;
+    text-decoration: none;
+}
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .block { width: 80px; height: 80px; font-size: 0.9em; }
+    h1 { font-size: 2em; }
+    .score { font-size: 1.2em; }
+}
