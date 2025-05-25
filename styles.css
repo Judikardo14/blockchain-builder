@@ -94,7 +94,18 @@ h1.glitch::after {
     animation: glitch-bottom 1.5s linear infinite;
     clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
 }
-
+@font-face {
+    font-family: 'Orbitron';
+    src: url('fonts/Orbitron-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Orbitron';
+    src: url('fonts/Orbitron-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}
 /* Animations glitch */
 @keyframes glitch {
     2%, 64% { transform: translate(2px, 0) skew(0deg); }
