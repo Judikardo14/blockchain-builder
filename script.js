@@ -1,38 +1,88 @@
-// Initialisation des particules
-particlesJS('particles-js', {
-    particles: {
-        number: { value: 80, density: { enable: true, value_area: 800 } },
-        color: { value: ['#00b7eb', '#39ff14'] },
-        shape: { type: 'circle' },
-        opacity: { value: 0.5, random: true },
-        size: { value: 3, random: true },
-        line_linked: { enable: true, distance: 150, color: '#39ff14', opacity: 0.4, width: 1 },
-        move: { enable: true, speed: 2, direction: 'none', random: true }
-    },
-    interactivity: {
-        events: { onhover: { enable: true, mode: 'repulse' }, onclick: { enable: true, mode: 'push' } },
-        modes: { repulse: { distance: 100 }, push: { particles_nb: 4 } }
-    }
-});
+// Créer le DOM dynamiquement
+const app = document.getElementById('app');
 
-const chain = document.getElementById('chain');
-const addBlockButton = document.getElementById('add-block');
-const resetGameButton = document.getElementById('reset-game');
-const shareScoreButton = document.getElementById('share-score');
-const scoreDisplay = document.getElementById('score');
-const securityLevelDisplay = document.getElementById('security-level');
-const timerDisplay = document.getElementById('timer');
-const messageDiv = document.getElementById('message');
-const introModal = document.getElementById('intro');
-const startGameButton = document.getElementById('start-game');
-const gameContainer = document.querySelector('.game-container');
-const leaderboardList = document.getElementById('leaderboard-list');
-const nftTeaser = document.getElementById('nft-teaser');
+// Modal d'introduction
+const introModal = document.createElement('div');
+introModal.id = 'intro';
+introModal.className = 'intro-modal';
+const modalContent = document.createElement('div');
+modalContent.className = 'modal-content';
+const modalTitle = document.createElement('h1');
+modalTitle.textContent = 'Welcome to Blockchain Builder!';
+const modalText = document.createElement('p');
+modalText.textContent = 'Mine blocks to build a secure blockchain with LayerEdge! Click rapidly to mine each block, collect power-ups, and unlock NFT rewards. Beat the 30-second challenge, climb the leaderboard, and share your score on X!';
+const startGameButton = document.createElement('button');
+startGameButton.id = 'start-game';
+startGameButton.textContent = 'Start Mining';
+modalContent.append(modalTitle, modalText, startGameButton);
+introModal.appendChild(modalContent);
 
+// Conteneur principal du jeu
+const gameContainer = document.createElement('div');
+gameContainer.className = 'game-container';
+gameContainer.style.display = 'none';
+const title = document.createElement('h1');
+title.className = 'glitch';
+title.textContent = 'Blockchain Builder';
+const scoreDisplay = document.createElement('div');
+scoreDisplay.className = 'score';
+scoreDisplay.innerHTML = 'Score: <span id="score">0</span> | Security Level: <span id="security-level">0%</span> | Time Left: <span id="timer">30s</span> | NFTs: <span id="nft-count">0</span>';
+const leaderboard = document.createElement('div');
+leaderboard.className = 'leaderboard';
+const leaderboardTitle = document.createElement('h2');
+leaderboardTitle.textContent = 'Leaderboard';
+const leaderboardList = document.createElement('ul');
+leaderboardList.id = 'leaderboard-list';
+leaderboard.append(leaderboardTitle, leaderboardList);
+const chain = document.createElement('div');
+chain.id = 'chain';
+chain.className = 'chain';
+const miningProgress = document.createElement('div');
+miningProgress.className = 'mining-progress';
+const progressBar = document.createElement('div');
+progressBar.id = 'progress-bar';
+progressBar.className = 'progress-bar';
+miningProgress.appendChild(progressBar);
+const mineBlockButton = document.createElement('button');
+mineBlockButton.id = 'mine-block';
+mineBlockButton.textContent = 'Mine Block with LayerEdge';
+const resetGameButton = document.createElement('button');
+resetGameButton.id = 'reset-game';
+resetGameButton.textContent = 'Reset Game';
+const shareScoreButton = document.createElement('button');
+shareScoreButton.id = 'share-score';
+shareScoreButton.textContent = 'Share Score on X';
+const powerUp = document.createElement('div');
+powerUp.id = 'power-up';
+powerUp.className = 'power-up hidden';
+powerUp.textContent = 'Power-Up!';
+const nftTeaser = document.createElement('div');
+nftTeaser.id = 'nft-teaser';
+nftTeaser.className = 'nft-teaser hidden';
+const nftTitle = document.createElement('h3');
+nftTitle.textContent = 'Congrats! You\'ve earned a LayerEdge NFT!';
+const nftPreview = document.createElement('div');
+nftPreview.className = 'nft-preview';
+nftTeaser.append(nftTitle, nftPreview);
+const message = document.createElement('div');
+message.id = 'message';
+message.className = 'message';
+const footer = document.createElement('footer');
+footer.innerHTML = 'Developed by Karol | <a href="https://x.com/iveobod" target="_blank">Follow @iveobod on X</a>';
+gameContainer.append(title, scoreDisplay, leaderboard, chain, miningProgress, mineBlockButton, resetGameButton, shareScoreButton, powerUp, nftTeaser, message, footer);
+
+// Ajouter les éléments au DOM
+app.append(introModal, gameContainer);
+
+// Logique du jeu
 let blockCount = 0;
+let nftCount = 0;
 let timeLeft = 30;
 let timerRunning = false;
-let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+let clicksToMine = 5;
+let currentClicks = 0;
+let leaderboardData = JSON.parse(localStorage.getItem('leaderboard')) || [];
+let doubleScore = false;
 
 const messages = [
     "LayerEdge secures your transactions with cutting-edge cryptography!",
@@ -44,7 +94,7 @@ const messages = [
 // Afficher le leaderboard
 function updateLeaderboard() {
     leaderboardList.innerHTML = '';
-    leaderboard.sort((a, b) => b - a).slice(0, 5).forEach((score, index) => {
+    leaderboardData.sort((a, b) => b - a).slice(0, 5).forEach((score, index) => {
         const li = document.createElement('li');
         li.textContent = `#${index + 1}: ${score} blocks`;
         leaderboardList.appendChild(li);
@@ -56,14 +106,14 @@ function startTimer() {
     timerRunning = true;
     const timerInterval = setInterval(() => {
         timeLeft--;
-        timerDisplay.textContent = `${timeLeft}s`;
+        document.getElementById('timer').textContent = `${timeLeft}s`;
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
             timerRunning = false;
-            addBlockButton.disabled = true;
-            messageDiv.textContent = `Time's up! Final Score: ${blockCount}. Share it or reset to try again!`;
-            leaderboard.push(blockCount);
-            localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+            mineBlockButton.disabled = true;
+            message.textContent = `Time's up! Final Score: ${blockCount}, NFTs: ${nftCount}. Share it or reset!`;
+            leaderboardData.push(blockCount);
+            localStorage.setItem('leaderboard', JSON.stringify(leaderboardData));
             updateLeaderboard();
         }
     }, 1000);
@@ -72,16 +122,43 @@ function startTimer() {
 // Réinitialiser le jeu
 function resetGame() {
     blockCount = 0;
+    nftCount = 0;
     timeLeft = 30;
+    currentClicks = 0;
     timerRunning = false;
-    scoreDisplay.textContent = blockCount;
-    securityLevelDisplay.textContent = '0%';
-    timerDisplay.textContent = `${timeLeft}s`;
+    doubleScore = false;
+    document.getElementById('score').textContent = blockCount;
+    document.getElementById('security-level').textContent = '0%';
+    document.getElementById('timer').textContent = `${timeLeft}s`;
+    document.getElementById('nft-count').textContent = nftCount;
     chain.innerHTML = '';
-    messageDiv.textContent = '';
+    message.textContent = '';
     nftTeaser.classList.add('hidden');
-    addBlockButton.disabled = false;
+    powerUp.classList.add('hidden');
+    progressBar.style.width = '0%';
+    mineBlockButton.disabled = false;
     startTimer();
+}
+
+// Afficher un power-up
+function spawnPowerUp() {
+    powerUp.classList.remove('hidden');
+    setTimeout(() => {
+        powerUp.classList.add('hidden');
+    }, 3000);
+}
+
+// Activer un power-up
+function activatePowerUp() {
+    const effects = [
+        () => { doubleScore = true; message.textContent = 'Double Score Activated!'; setTimeout(() => doubleScore = false, 5000); },
+        () => { timeLeft += 5; message.textContent = 'Time Extended by 5s!'; }
+    ];
+    const randomEffect = effects[Math.floor(Math.random() * effects.length)];
+    randomEffect();
+    powerUp.classList.add('hidden');
+    message.style.animation = 'none';
+    setTimeout(() => message.style.animation = 'fadeIn 1s forwards', 10);
 }
 
 // Afficher le jeu
@@ -92,41 +169,58 @@ startGameButton.addEventListener('click', () => {
     updateLeaderboard();
 });
 
-// Ajouter un bloc
-addBlockButton.addEventListener('click', () => {
+// Miner un bloc
+mineBlockButton.addEventListener('click', () => {
     if (!timerRunning) return;
-    blockCount++;
-    const block = document.createElement('div');
-    block.className = 'block';
-    block.textContent = `Block ${blockCount}`;
-    chain.appendChild(block);
+    currentClicks++;
+    progressBar.style.width = `${(currentClicks / clicksToMine) * 100}%`;
+    if (currentClicks >= clicksToMine) {
+        currentClicks = 0;
+        progressBar.style.width = '0%';
+        blockCount += doubleScore ? 2 : 1;
+        const block = document.createElement('div');
+        block.className = 'block';
+        block.textContent = `Block ${blockCount}`;
+        chain.appendChild(block);
 
-    // Mettre à jour le score et le niveau de sécurité
-    scoreDisplay.textContent = blockCount;
-    const securityLevel = Math.min(blockCount * 10, 100);
-    securityLevelDisplay.textContent = `${securityLevel}%`;
+        // Mettre à jour le score et le niveau de sécurité
+        document.getElementById('score').textContent = blockCount;
+        const securityLevel = Math.min(blockCount * 10, 100);
+        document.getElementById('security-level').textContent = `${securityLevel}%`;
 
-    // Afficher un message promotionnel
-    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-    messageDiv.textContent = randomMessage;
-    messageDiv.style.animation = 'none';
-    setTimeout(() => messageDiv.style.animation = 'fadeIn 1s forwards', 10);
+        // Afficher un message promotionnel
+        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+        message.textContent = randomMessage;
+        message.style.animation = 'none';
+        setTimeout(() => message.style.animation = 'fadeIn 1s forwards', 10);
 
-    // Afficher le teaser NFT tous les 5 blocs
-    if (blockCount % 5 === 0) {
-        nftTeaser.classList.remove('hidden');
+        // Afficher le teaser NFT tous les 5 blocs
+        if (blockCount % 5 === 0) {
+            nftCount++;
+            document.getElementById('nft-count').textContent = nftCount;
+            nftTeaser.classList.remove('hidden');
+            setTimeout(() => nftTeaser.classList.add('hidden'), 3000);
+        }
+
+        // Afficher un power-up à certains blocs
+        if ([3, 8, 12].includes(blockCount)) {
+            spawnPowerUp();
+        }
+
+        // Défilement automatique
+        chain.scrollLeft = chain.scrollWidth;
     }
-
-    // Défilement automatique
-    chain.scrollLeft = chain.scrollWidth;
 });
+
+// Activer le power-up
+powerUp.addEventListener('click', activatePowerUp);
 
 // Réinitialiser le jeu
 resetGameButton.addEventListener('click', resetGame);
 
-// Partager le score sur X
+// Partager le score
 shareScoreButton.addEventListener('click', () => {
-    const tweetText = `I built ${blockCount} blocks with LayerEdge in Blockchain Builder! 🚀 Try it yourself! #LayerEdge @iveobod`;
+    const tweetText = `I mined ${blockCount} blocks and earned ${nftCount} NFTs with LayerEdge in Blockchain Builder! 🚀 Try it! #LayerEdge @iveobod`;
     const tweetUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
     window.open(tweetUrl, '_blank');
 });
