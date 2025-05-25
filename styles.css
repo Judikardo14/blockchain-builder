@@ -1,3 +1,16 @@
+@font-face {
+    font-family: 'Orbitron';
+    src: url('fonts/Orbitron-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Orbitron';
+    src: url('fonts/Orbitron-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}
+
 body {
     margin: 0;
     font-family: 'Orbitron', sans-serif;
@@ -8,12 +21,35 @@ body {
     overflow-x: hidden;
 }
 
-/* Fond de particules */
-#particles-js {
+/* Fond grille cyberpunk */
+body::before {
+    content: '';
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 10px,
+        rgba(0, 183, 235, 0.2) 10px,
+        rgba(0, 183, 235, 0.2) 11px
+    ),
+    repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 10px,
+        rgba(57, 255, 20, 0.2) 10px,
+        rgba(57, 255, 20, 0.2) 11px
+    );
+    animation: gridPulse 10s linear infinite;
     z-index: 1;
+}
+@keyframes gridPulse {
+    0% { opacity: 0.3; transform: translateY(0); }
+    50% { opacity: 0.6; transform: translateY(-10px); }
+    100% { opacity: 0.3; transform: translateY(0); }
 }
 
 /* Modal d'introduction */
@@ -68,7 +104,6 @@ body {
     padding: 20px;
     position: relative;
     z-index: 2;
-    display: none;
 }
 h1.glitch {
     font-size: 2.5em;
@@ -78,7 +113,7 @@ h1.glitch {
     animation: glitch 1s linear infinite;
 }
 h1.glitch::before, h1.glitch::after {
-    content: 'LayerEdge Blockchain Builder';
+    content: 'Blockchain Builder';
     position: absolute;
     top: 0;
     left: 0;
@@ -94,18 +129,7 @@ h1.glitch::after {
     animation: glitch-bottom 1.5s linear infinite;
     clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
 }
-@font-face {
-    font-family: 'Orbitron';
-    src: url('fonts/Orbitron-Regular.woff2') format('woff2');
-    font-weight: 400;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'Orbitron';
-    src: url('fonts/Orbitron-Bold.woff2') format('woff2');
-    font-weight: 700;
-    font-style: normal;
-}
+
 /* Animations glitch */
 @keyframes glitch {
     2%, 64% { transform: translate(2px, 0) skew(0deg); }
@@ -131,6 +155,7 @@ h1.glitch::after {
     text-shadow: 0 0 5px #39ff14;
 }
 #timer { color: #ff073a; animation: pulse 1s infinite; }
+#nft-count { color: #ff073a; }
 @keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.1); }
@@ -164,6 +189,7 @@ h1.glitch::after {
     padding: 20px;
     max-width: 100%;
     overflow-x: auto;
+    perspective: 1000px;
 }
 .block {
     width: 100px;
@@ -180,6 +206,11 @@ h1.glitch::after {
     animation: materialize 0.5s ease-in-out;
     position: relative;
     overflow: hidden;
+    transform: rotateY(10deg);
+    transition: transform 0.3s;
+}
+.block:hover {
+    transform: rotateY(0deg);
 }
 .block::before {
     content: '';
@@ -190,6 +221,41 @@ h1.glitch::after {
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
     animation: scan 2s infinite;
+}
+
+/* Barre de progression */
+.mining-progress {
+    width: 200px;
+    height: 20px;
+    background: #1b1b4f;
+    border: 2px solid #00b7eb;
+    border-radius: 10px;
+    margin: 10px auto;
+    overflow: hidden;
+}
+.progress-bar {
+    width: 0;
+    height: 100%;
+    background: linear-gradient(45deg, #39ff14, #00b7eb);
+    transition: width 0.3s ease;
+}
+
+/* Power-up */
+.power-up {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px 20px;
+    background: #ff073a;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 1.2em;
+    cursor: pointer;
+    animation: pulse 1s infinite;
+}
+.power-up:hover {
+    box-shadow: 0 0 15px #ff073a;
 }
 
 /* NFT Teaser */
@@ -206,15 +272,20 @@ h1.glitch::after {
     background: linear-gradient(45deg, #ff073a, #00b7eb);
     margin: 10px auto;
     border-radius: 8px;
-    animation: pulse 1s infinite;
+    animation: sparkle 1s infinite;
+}
+@keyframes sparkle {
+    0% { box-shadow: 0 0 10px #ff073a; }
+    50% { box-shadow: 0 0 20px #00b7eb; }
+    100% { box-shadow: 0 0 10px #ff073a; }
 }
 .hidden { display: none; }
 
 /* Animations */
 @keyframes materialize {
-    0% { transform: scale(0); opacity: 0; }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); opacity: 1; }
+    0% { transform: scale(0) rotateY(90deg); opacity: 0; }
+    50% { transform: scale(1.2) rotateY(45deg); }
+    100% { transform: scale(1) rotateY(10deg); opacity: 1; }
 }
 @keyframes scan {
     0% { left: -100%; }
@@ -225,6 +296,9 @@ h1.glitch::after {
     0% { text-shadow: 0 0 10px #00b7eb, 0 0 20px #00b7eb; }
     100% { text-shadow: 0 0 20px #00b7eb, 0 0 30px #39ff14; }
 }
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
 
 /* Message */
 .message {
@@ -234,9 +308,6 @@ h1.glitch::after {
     text-shadow: 0 0 5px #39ff14;
     opacity: 0;
     animation: fadeIn 1s forwards;
-}
-@keyframes fadeIn {
-    to { opacity: 1; }
 }
 
 /* Boutons */
@@ -254,6 +325,10 @@ button {
 button:hover {
     transform: scale(1.1);
     box-shadow: 0 0 15px #00b7eb;
+}
+button:disabled {
+    background: #555;
+    cursor: not-allowed;
 }
 
 /* Footer */
